@@ -24,6 +24,7 @@ jobs:
         repository: "armory3d/armorai"
         fileName: "models.zip"
         out-file-path: "armorlab/Assets/models"
+        latest: true
 
     - name: Unzip AI
       # You may pin to the exact commit or the version.
