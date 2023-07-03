@@ -19,7 +19,7 @@ jobs:
       run: git submodule update --init --recursive
       
     - name: Dowload AI assets
-      run: curl "https://github.com/armory3d/armorai/releases/download/2023.4/models.zip" -o "./armorlab/Assets/models/models.zip" 
+      run: fetch --repo="https://github.com/armory3d/armorai" --tag="2023.4" --release-asset="models.zip" --github-oauth-token=${GITHUB_OAUTH_TOKEN}
     
     - name: Unzip AI
       # You may pin to the exact commit or the version.
