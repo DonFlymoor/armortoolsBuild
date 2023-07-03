@@ -1,0 +1,53 @@
+name: Windows (Direct3D12)
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get Submodules
+      run: git submodule update --init --recursive
+      
+    - name: Dowload AI assets
+      run: curl "https://github.com/armory3d/armorai/releases/models.zip" -o "./armorlab/Assets/models/models.zip" 
+    
+    - name: Unzip AI
+      # You may pin to the exact commit or the version.
+      # uses: TonyBogdanov/zip@bd7d01f6fe96c00324826a8f94cfb289d5363901
+      uses: TonyBogdanov/zip@1.0
+      with:
+        args: unzip -qq "./armorlab/Assets/models/models.zip" -d "./armorlab/Assets/models/"
+    - name: Unzip Assets
+      # You may pin to the exact commit or the version.
+      # uses: TonyBogdanov/zip@bd7d01f6fe96c00324826a8f94cfb289d5363901
+      uses: TonyBogdanov/zip@1.0
+      with:
+        args: unzip -qq "./armorcore/v8/libraries/win32/release/v8_monolith.7z" -d "./"
+    
+    - name: Compile
+      run: armorcore/Kinc/make --from armorcore -g direct3d12
+      
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Build app for release
+      run: msbuild "./armorlab/build/ArmorLab.sln" -t:rebuild -verbosity:diag -property:Configuration=Release
+   
+    - name: Move exe
+      run: move "./armorlab/build/x64/Release/ArmorLab.exe" "./armorlab/build/krom/"
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ArmorLab
+        path: "./armorlab/build"
